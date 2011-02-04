@@ -73,6 +73,11 @@ abstract class Jelly_Field_Core
 	public $callbacks = array();
 
 	/**
+	 * @var  string  field view
+	 */
+	public $view = NULL;
+
+	/**
 	 * Sets all options
 	 *
 	 * @return  void
@@ -178,8 +183,15 @@ abstract class Jelly_Field_Core
 	 **/
 	public function input($prefix = 'jelly/field', $data = array())
 	{
-		// Get the view name
-		$view = $this->_input_view($prefix);
+		if ( ! is_null ($this->view))
+		{
+			$view = $this->view;
+		}
+		else
+		{
+			// Get the view name
+			$view = $this->_input_view($prefix);
+		}
 
 		// Grant acces to all of the vars plus the field object
 		$data = array_merge(get_object_vars($this), $data, array('field' => $this));

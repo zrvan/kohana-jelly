@@ -443,10 +443,18 @@ abstract class Jelly_Model_Core
 				}
 				else
 				{
-					// Insert defaults
-					if ( ! $key AND ! $this->changed($field->name) AND ! $field->primary)
+					if ( ! ($field instanceof Jelly_Field_Behavior_SetByDB))
 					{
-						$values[$field->name] = $field->default;
+						// Insert defaults
+						// if ( ! $key AND ! $this->changed($field->name) AND ! $field->primary)
+						if ( ! $key AND ! $this->changed($field->name))
+						{
+							$values[$field->name] = $field->default;
+						}
+					}
+					else
+					{
+						Kohana::$log->add ('debug', 'setbydb: :name -> :default', array (':name' => $field->name, ':default' => json_encode ($field->default), ));
 					}
 				}
 			}

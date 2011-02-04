@@ -100,6 +100,11 @@ abstract class Jelly_Field_BelongsTo extends Jelly_Field_Relationship implements
 	 */
 	public function get($model, $value)
 	{
+		if ( is_null ($value))
+		{
+			// allow orphans (if column foreign key constrained but allows NULL)
+			return NULL;
+		}
 		return Jelly::select($this->foreign['model'])
 				->where($this->foreign['column'], '=', $value)
 				->limit(1);

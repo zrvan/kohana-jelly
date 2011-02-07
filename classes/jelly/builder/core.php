@@ -53,6 +53,9 @@ abstract class Jelly_Builder_Core extends Kohana_Database_Query_Builder_Select
 	 */
 	protected $_result = NULL;
 
+	// @xxx: testing cache
+	static protected $_cache = array ();
+
 	/**
 	 * Constructs a new Jelly_Builder instance.
 	 *
@@ -170,13 +173,37 @@ abstract class Jelly_Builder_Core extends Kohana_Database_Query_Builder_Select
 	 * @param  mixed $key
 	 * @return Jelly_Model
 	 */
-	public function load($key = NULL)
+	public function load($key = NULL, $use_cache = true)
 	{
 		if ($this->_type === Database::SELECT)
 		{
 			if ($key !== NULL)
 			{
-				$this->where(':unique_key', '=', $key);
+				if ($use_cache == true)
+				{
+					// @xxx: testing cache
+					if (isset (self::$_cache[$this->_model][$key]))
+					{
+						Kohana::$log->add ('debug', 'serving cached object model: :model -> key: :key', array (':model' => $this->_model, ':key' => $key, ));
+						return self::$_cache[$this->_model][$key];
+					}
+					else
+					{
+						$this->where(':unique_key', '=', $key);
+
+						if ( ! isset (self::$_cache[$this->_model]))
+						{
+							self::$_cache[$this->_model] = array ();
+						}
+
+						self::$_cache[$this->_model][$key] = $this->limit (1)->execute ();
+						return self::$_cache[$this->_model][$key];
+					}
+				}
+				else
+				{
+					$this->where(':unique_key', '=', $key);
+				}
 			}
 
 			return $this->limit(1)->execute();
